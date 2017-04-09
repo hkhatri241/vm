@@ -30,10 +30,8 @@ enum opCode{
 	END = 14,
 	DUP = 15,
 	FLIP = 16,
-	GET = 17,
-	PUT = 18,
-	NOP = 19,
-	PUSH = 20
+	NOP = 17,
+	PUSH = 18
 };
 
 struct instruction {  //encapsulates opcode +plus arg, every arg is 16 bit long
