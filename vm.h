@@ -1,7 +1,7 @@
 #ifndef VM
 #define VM
-#define STACK_SIZE 65536   //sp is int16_t
-#define MEMORY_SIZE 65536
+#define STACK_SIZE 65536   //sp is 16  bits
+#define CODE_MEMORY_SIZE 65536
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -14,26 +14,26 @@
 */
 
 enum opCode{
-	READ = 0,
-	WRTD = 1,
-	ADD = 2,
-	SUB = 3,
-	MUL = 4,
-	DIV = 5,
-	POP = 6,
-	EQU = 7,
-	GRT = 8,
-	LST = 9,
-	GOTO = 10,
-	GOIF = 11,
-	GOUN = 12,
-	END = 13,
-	DUP = 14,
-	FLIP = 15,
-	GET = 16,
-	PUT = 17,
-	NOP = 18,
-	PUSH = 19
+	READ = 1,
+	WRTD = 2,
+	ADD = 3,
+	SUB = 4,
+	MUL = 5,
+	DIV = 6,
+	POP = 7,
+	EQU = 8,
+	GRT = 9,
+	LST = 10,
+	GOTO = 11,
+	GOIF = 12,
+	GOUN = 13,
+	END = 14,
+	DUP = 15,
+	FLIP = 16,
+	GET = 17,
+	PUT = 18,
+	NOP = 19,
+	PUSH = 20
 };
 
 struct instruction {  //encapsulates opcode +plus arg, every arg is 16 bit long
@@ -55,7 +55,7 @@ struct vMachine{
 };
 
 
-bool setBit(uint8_t *flag,int x){
+void setBit(uint8_t *flag,int x){
 
 	if(x > 7){
 		printf("Invalid bit to be set");
@@ -64,7 +64,7 @@ bool setBit(uint8_t *flag,int x){
 
 }
 
-bool clearBit(uint8_t *flag,int x){
+void clearBit(uint8_t *flag,int x){
 
 	if(x > 7){
 		printf("Invalid bit to be set");
@@ -73,27 +73,33 @@ bool clearBit(uint8_t *flag,int x){
 
 }
 
-bool setNegative(uint8_t* flag) {
+void clearFlag(uint8_t* flag) {
+	int i;
+	for(i = 0; i < 8; i++)
+		clearBit(flag, i);
+}
+
+void setNegative(uint8_t* flag) {
 
 	setBit(flag, 7);
 }
 
-bool setZero(uint8_t* flag) {
+void setZero(uint8_t* flag) {
 
 	setBit(flag, 6);
 }
 
-bool setAC(uint8_t* flag) {
+void setAC(uint8_t* flag) {
 
 	setBit(flag, 4);
 }
 
-bool setParity(uint8_t* flag) {
+void setParity(uint8_t* flag) {
 
 	setBit(flag, 1);
 }
 
-bool setCarry(uint8_t* flag) {
+void setCarry(uint8_t* flag) {
 
 	setBit(flag, 0);
 }
