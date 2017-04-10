@@ -18,7 +18,7 @@ struct vMachine* newVM() {
 	vm->registers.ir.arg = 0;
 	clearFlag(&vm->registers.flag);
 	//allocate stack and code memory
-	vm->stack = (int16_t*)(malloc(STACK_SIZE*sizeof(uint16_t)));
+	vm->stack = (int16_t*)(malloc(STACK_SIZE*sizeof(int16_t)));
 	vm->code = (int16_t*)(malloc(CODE_MEMORY_SIZE*sizeof(uint16_t)));
 	return vm;
 }

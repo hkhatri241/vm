@@ -1,6 +1,6 @@
 #ifndef VM
 #define VM
-#define STACK_SIZE 65536   //sp is 16  bits
+#define STACK_SIZE 32768   //sp is 16  bits
 #define CODE_MEMORY_SIZE 65536
 
 #include <stdint.h>
@@ -40,8 +40,8 @@ struct instruction {  //encapsulates opcode +plus arg, every arg is 16 bit long
 };
 
 struct reg {// pc = program counter,sp = stack pointer,ir = instruction register and flag is defined in docs
-	int16_t pc;
-	int16_t sp;
+	uint16_t pc; //max code size is 65536
+	int16_t sp; //Only time sp is negative is initially = -1. All else 0<= sp <32768
 	struct instruction ir;
 	uint8_t flag;
 };
