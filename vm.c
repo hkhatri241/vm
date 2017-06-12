@@ -1,11 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "vm.h"
+#include "bit.h"
 #define VPUSH(vm,v) vm->stack[++vm->registers.sp]=v
 //Pushes v to stack of vm
 #define VPOP(vm) vm->stack[vm->registers.sp--]
 
 
+//CHANGE THIS.
+//Function to  refactor out common code from all variant of goto instructions. 
+void jump(struct vMachine* vm){
+	//POP NEW PC.
+	uint16_t newPc = VPOP(vm);
+	//PUSH CURRENT PC ONTO STACK.
+	VPUSH(vm,vm->registers.pc);
+	//set PC AS NEWPC
+	vm->registers.pc = newPc;
+}
 
 //TODO Checks for memory and stack size during calculation
 //create a new vm
@@ -15,11 +26,10 @@ struct vMachine* newVM() {
 	vm->registers.pc = 0; //initialize program counter to first instruction
 	vm->registers.sp = -1;
 	vm->registers.ir.code = 0; //0 does not correspond to any instruction
-	vm->registers.ir.arg = 0;
 	clearFlag(&vm->registers.flag);
 	//allocate stack and code memory
 	vm->stack = (int16_t*)(malloc(STACK_SIZE*sizeof(int16_t)));
-	vm->code = (int16_t*)(malloc(CODE_MEMORY_SIZE*sizeof(uint16_t)));
+	vm->code = (int16_t*)(malloc(CODE_MEMORY_SIZE*sizeof(int16_t)));
 	return vm;
 }
 
@@ -39,27 +49,6 @@ void fetch(struct vMachine* vm) {
 	vm->registers.ir.code = code;
 }
 
-/*Reads in opcode from ir.code
-* Checks whether it has operand
-* No operand - Increments pc 
-* Operand - Stores it in ir.arg
-* Current design of bytecode permits only 1 16 bit argument with PUSH
-*/
-void decode(struct vMachine* vm) {
-
-	uint16_t code = vm->registers.ir.code;
-	switch(code){
-
-		case PUSH:
-			vm->registers.ir.arg = vm->code[vm->registers.pc];
-			vm->registers.pc++;
-			break;
-
-		default: //All else instructions have no arguments
-			break;
-	}
-
-}
 
 //Take the instruction 
 
@@ -73,8 +62,9 @@ void execute(struct vMachine *vm) {
 				break;
 			}
 		case PUSH: {
-				vm->registers.sp++;
-				vm->stack[vm->registers.sp] = vm->registers.ir.arg;
+				//GET 16 BIT DATA VALUE FROM NEXT POSITION AND INC. PC
+				int16_t data = vm->code[vm->registers.pc++];
+				VPUSH(vm,data);
 				break;
 			}
 		case EQU: ;{  //Semicolon inserted because c grammer does not allow decalaration after a label
@@ -110,9 +100,119 @@ void execute(struct vMachine *vm) {
 				a > b ? setZero(&vm->registers.flag) : clearFlag(&vm->registers.flag);
 				break;
 			}
-		case NOP:
-			break;
+		case ADD: ;{
+				int16_t a = VPOP(vm);
+				int16_t b = VPOP(vm);
 
+				if(isAddSafe(a,b)){
+					clearFlag(&vm->registers.flag);
+				} else{
+					setCarry(&vm->registers.flag);
+				}	
+
+				VPUSH(vm, (a+b));
+				break;
+			}
+		case SUB: ;{
+				int16_t a = VPOP(vm);
+				int16_t b = VPOP(vm);
+				int16_t c = a-b;
+
+				if(!c){
+					setZero(&vm->registers.flag);
+				} else if(c < 0){
+					setNegative(&vm->registers.flag);
+				}
+
+				VPUSH(vm,c);				
+				break;
+			}
+		case MUL: ;{
+				int16_t a = VPOP(vm);
+				int16_t b = VPOP(vm);
+				int16_t c = a*b;
+
+				if(a == 0 || b == 0){ // set zero flag if either 0
+					setZero(&vm->registers.flag);
+					VPUSH(vm,c);
+
+				} else if(isMulSafe(a,b)){
+					clearFlag(&vm->registers.flag);
+					VPUSH(vm,c);
+
+				} else{
+					setCarry(&vm->registers.flag);
+					VPUSH(vm,c);
+				}
+				break;
+			}
+		case GOTO: ;{
+				
+				jump(vm);
+				break;
+			}
+		case GOZ: ;{
+
+				if(isSet(&vm->registers.flag,7)){
+					jump(vm);
+				}
+				break;
+			}
+		case GOC: ;{
+
+				if(isSet(&vm->registers.flag,1)){
+					jump(vm);
+				}
+
+				break;
+			}
+		case GOP: ;{
+
+				if(isSet(&vm->registers.flag,2)){
+					jump(vm);
+				}
+
+				break;
+			}
+		case GOC: ;{
+
+				if(isSet(&vm->registers.flag,8)){
+					jump(vm);
+				}
+
+				break;
+			}
+		case GONZ: ;{
+
+				if(!isSet(&vm->registers.flag,7)){
+					jump(vm);
+				}
+				break;
+			}
+		case GONZ: ;{
+
+				if(!isSet(&vm->registers.flag,7)){
+					jump(vm);
+				}
+				break;
+			}
+		case READ: ;{
+				//get memory address.
+				int16_t memLoc = VPOP(vm);
+				int16_t data = vm->code[memLoc];
+				VPUSH(vm, data);
+				break;
+			}
+		case WRTD: ;{
+				//POP mem address and data.
+				int16_t data = VPOP(vm);
+				int16_t memLoc = VPOP(vm);
+				vm->code[memLoc] = data;
+				break;
+			}
+		default:
+				printf("This op is not supported.");
+				break;
 
 
 	}
