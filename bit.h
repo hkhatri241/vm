@@ -1,5 +1,5 @@
-#ifndef BIT
-#define BIT
+#ifndef BIT_H
+#define BIT_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -7,9 +7,9 @@
 //CURRENT IMPLEMENTATION IN VM.C DOES NOT MAKE USE OF SET PARITY.
 //CHANGES ARE NOT REFLECTED TO PARITY BIT IN FLAG REGISTER.
 
-void setBit(uint8_t *flag,int x);
+static void setBit(uint8_t *flag,int x);
 
-void clearBit(uint8_t *flag,int x);
+static void clearBit(uint8_t *flag,int x);
 
 void clearFlag(uint8_t* flag); 
 

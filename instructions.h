@@ -18,15 +18,23 @@ enum opCode{
 	END = 14,
 	DUP = 15, //d
 	FLIP = 16, //d
-	NOP = 17, //no idea what this is.
+	NOP = 17, //no op.blank.does nothing.
 	PUSH = 18, //d
 	GON = 19, //jump if negative flag is set
 	GOP = 20, //jump if parity set
-	GOC = 21 //jum if carry set
+	GOC = 21,//jum if carry set
+	GONC = 22,
+	GONP = 23,
+	ADDC = 24, // add  count register by amount specified on stack top which is permanently popped
+	SUBC = 25, // subtract  count register byamount specified on stack top which is permanently popped
+	ADC = 26, //add with carry
+	SBC = 27, //subtract with carry
+	IN = 28, //waits for user input and pushes it onto top of stack
+	OUT = 29 //pops from top of stack and prints it
 };
-
+//add return
 struct instruction {  //encapsulates opcode +plus arg, every arg is 16 bit long
-	int16_t code;
+	uint16_t code;
 
 };
 

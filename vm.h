@@ -1,7 +1,6 @@
-#ifndef VM
-#define VM
-#define STACK_SIZE 32767   //sp is 16  bits
-#define CODE_MEMORY_SIZE 65535
+#ifndef VM_H
+#define VM_H
+
 
 #include <stdint.h>
 #include "instructions.h"
@@ -19,12 +18,12 @@ struct reg {// pc = program counter,sp = stack pointer,ir = instruction register
 	int16_t sp; //Only time sp is negative is initially = -1. All else 0<= sp <32768
 	struct instruction ir;
 	uint8_t flag;
+	int16_t count; //set to zero on startup
 };
 
 struct vMachine{
 	struct reg registers;
-	int16_t* stack;
-	int16_t* code;
+	
 };
 
 #endif

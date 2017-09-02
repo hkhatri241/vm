@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "bit.h"
 
-void setBit(uint8_t *flag,int x){
+static void setBit(uint8_t *flag,int x){
 
 	if(x > 7){
 		printf("Invalid bit to be set");
@@ -11,7 +11,7 @@ void setBit(uint8_t *flag,int x){
 
 }
 
-void clearBit(uint8_t *flag,int x){
+static void clearBit(uint8_t *flag,int x){
 
 	if(x > 7){
 		printf("Invalid bit to be cleared");
@@ -20,6 +20,7 @@ void clearBit(uint8_t *flag,int x){
 
 }
 
+//completely stupid. just and with 0 to clear flag.
 void clearFlag(uint8_t* flag) {
 	int i;
 	for(i = 0; i < 8; i++)
@@ -27,10 +28,10 @@ void clearFlag(uint8_t* flag) {
 }
 
 //returns true if bit at bitPostion is set.
-//NOTE: bitPosition = 1 correspods to bit 1.
+//NOTE: bitPosition = 1 corresponds to bit 1.
 //Not  zero indexed, like C arrays. 
 bool isSet(uint8_t* flag, int bitPosition){
-	
+	uint8_t temp = *flag;
 	return (temp & (1 << (bitPosition - 1)))? true: false;
 }
 
