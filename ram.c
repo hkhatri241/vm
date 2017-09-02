@@ -35,14 +35,29 @@ void storeStack(struct ram* ram,int16_t addr,uint16_t data){
 	ram->stack[addr] = data;	
 
 }
-void loadCodeIntoRam(struct ram* ram,char* filename){
-	char* opcode = NULL;
-	if(file == NULL){
+bool loadCodeIntoRam(struct ram* ram,const char* filename){
+	ssize_t read;
+	char* line = NULL;
+	int op;
+	size_t len = 10;
+	FILE*  fp = fopen(filename,"r");
+	if(fp == NULL){
 		printf("No file name. Exit");
 		exit(1);
 	}
+	int i =0;
+	bool isEmpty = true;
 
-	while()
+	while((read = getline(&line,&len,fp))!=-1){
+		isEmpty = false;
+		uint16_t op = atoi(line);
+		printf("%u",op);
+		ram->code[i] = op;
+		i++;
+	}
+	fclose(fp);
+
+	return isEmpty;
 }
 
 void storeMem(struct ram* ram,uint16_t addr,uint16_t data){
@@ -55,8 +70,9 @@ void storeMem(struct ram* ram,uint16_t addr,uint16_t data){
 
 
 void delRam(struct ram* ram){
-	free(ram->code);
-	free(ram->stack);
+	//free(ram->code);
+	//free(ram->stack);
+	free(ram);
 }
 
 

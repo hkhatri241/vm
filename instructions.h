@@ -25,12 +25,13 @@ enum opCode{
 	GOC = 21,//jum if carry set
 	GONC = 22,
 	GONP = 23,
-	ADDC = 24, // add  count register by amount specified on stack top which is permanently popped
-	SUBC = 25, // subtract  count register byamount specified on stack top which is permanently popped
+	ADDC = 24, // add  count register by amount specified on stack top which is NOT popped
+	SUBC = 25, // subtract  count register byamount specified on stack top which is NOT popped
 	ADC = 26, //add with carry
 	SBC = 27, //subtract with carry
 	IN = 28, //waits for user input and pushes it onto top of stack
-	OUT = 29 //pops from top of stack and prints it
+	OUT = 29, //pops from top of stack and prints it
+	MOV = 30 //move from from top of stack to count register
 };
 //add return
 struct instruction {  //encapsulates opcode +plus arg, every arg is 16 bit long

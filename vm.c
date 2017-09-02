@@ -26,7 +26,7 @@ void jump(struct vMachine* vm, struct ram* ram){
 	//PUSH CURRENT PC ONTO STACK.
 	//VPUSH(vm,vm->registers.pc);//currently removed. cant return,
 	//set PC AS NEWPC-
-	printf("\njumping to  : %u",newPc);
+	//printf("\njumping to  : %u\n",newPc);
 	vm->registers.pc = newPc;
 }
 
@@ -52,7 +52,7 @@ void delVM(struct vMachine* vm) {
 void fetch(struct vMachine* vm,struct ram* ram) {
 
 	uint16_t code = loadMem( ram, vm->registers.pc);
-	printf("\non location : %u",vm->registers.pc);
+	//printf("\non location : %u",vm->registers.pc);
 	vm->registers.pc++; //increment pc
 	vm->registers.ir.code = code;
 }
@@ -63,17 +63,18 @@ void fetch(struct vMachine* vm,struct ram* ram) {
 bool execute(struct vMachine* vm,struct ram* ram) {
 
 	uint16_t code = vm->registers.ir.code;
+	//printf("%u\n",(unsigned int)code);
 	switch(code){
 
 		case POP: {
-				printf("\nPopped : %u",loadStack(ram, vm->registers.sp));
+				printf("\nPopped : %u\n",loadStack(ram, vm->registers.sp));
 				vm->registers.sp--;
 				break;
 			}
 		case PUSH: {
 				//GET 16 BIT DATA VALUE FROM NEXT POSITION AND INC. PC
 				uint16_t data = loadMem(ram, vm->registers.pc++);
-				printf("\nPushed : %u",data);
+				printf("\nPushed : %u\n",data);
 				VPUSH(vm,data,ram);
 				break;
 			}
@@ -81,7 +82,7 @@ bool execute(struct vMachine* vm,struct ram* ram) {
 				uint16_t a = VPOP(vm,ram);  // See http://stackoverflow.com/questions/18496282/why-do-i-get-a-label-can-only-be-part-of-a-statement-and-a-declaration-is-not-a
 				uint16_t b = VPOP(vm,ram);
 				a == b ? setZero(&vm->registers.flag) : clearFlag(&vm->registers.flag);
-				printf("Zero Flag : %u",isSet(&vm->registers.flag,7));
+				//printf("Zero Flag : %u",isSet(&vm->registers.flag,7));
 				VPUSH(vm, b, ram);
 				VPUSH(vm, a, ram);
 				break;
@@ -196,6 +197,9 @@ bool execute(struct vMachine* vm,struct ram* ram) {
 		case GONZ: ;{
 
 				if(!isSet(&vm->registers.flag,7)){
+					setZero(&vm->registers.flag);
+					uint16_t addr = loadMem(ram, vm->registers.pc++);
+					VPUSH(vm, addr, ram);
 					jump(vm, ram);
 				}
 				break;
@@ -224,24 +228,35 @@ bool execute(struct vMachine* vm,struct ram* ram) {
 		case ADDC: ;{
 				//increment counter by amount
 				uint16_t data = VPOP(vm,ram);
+				VPUSH(vm, data, ram);
 				vm->registers.count += data;
 				break;
 			}
 		case SUBC: ;{
 				//increment counter by amount
 				uint16_t data = VPOP(vm,ram);
+				VPUSH(vm, data, ram);
 				vm->registers.count -= data;
+				if(!data)
+					setZero(&vm->registers.flag);
 				break;
 			}
 		case IN: ;{
 				uint16_t data;
+				
+				printf("Enter input");
 				scanf("%" SCNu16,&data);
 				VPUSH(vm,data,ram);
 				break;
 		}
 		case OUT: ;{
 				uint16_t a = VPOP(vm,ram);
+				VPUSH(vm, a, ram);
 				printf("%u", (unsigned int)a);
+				break;
+		}
+		case MOV: ;{
+				vm->registers.count = VPOP(vm, ram);
 				break;
 		}
 		case END: ;{
@@ -250,7 +265,8 @@ bool execute(struct vMachine* vm,struct ram* ram) {
 		}
 		default:
 				printf("This op is not supported.");
-				break;
+				
+				return true;
 	}
 	//CONTINUE EXECUTING
 	return false;
@@ -263,6 +279,7 @@ void run(struct vMachine *vm,struct ram* ram) {
 		fetch(vm,ram); //fetch instruction into vm
 		halt = execute(vm,ram);
 
+
 	}while(!halt);
 }
 
@@ -274,8 +291,11 @@ int main(int argc,char* argv) {
 	const char* filename = "out_code.txt";
 
 	//assembly to hexcode type and loads it into ram->code
-	loadCodeIntoRam(ram,filename);
-	
+	bool isEmpty = loadCodeIntoRam(ram,filename);
+
+	if(isEmpty)
+		exit(1);
+
 	//run
 	run(vm,ram);
 

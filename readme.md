@@ -1,18 +1,40 @@
-# TinyVM
+# VM and TIC TAC TOE
 
-Stack based VM. Constant szied instructions of 4 bytes. 65535 , 16 bit addressable memory.
+
+Tasks:
+1.) Implement VM. DONE
+2.) Implement ASsembler and instruction set. DONE
+3.) Implement Tic Tac Toe game. NOT DONE.
 
 ### Prerequisites
 
-GCC/Clang
+GCC/Clang and python
 
 
 ### Installing
 
-```
-gcc -o vm vm.c
-./vm
-```
+
+compile bit.c
+
+gcc -c -o bit.o bit.c
+
+compile  ram.c
+
+gcc -c -o ram.o ram.c
+
+compile vm 
+
+gcc -o vm vm.c bit.o ram.o
+
+
+Finally run. ./vm
+
+Note: the assembled file is hardcoded.
+
+To invoke  the assembler.
+python assemble.py
+
+File name is hard coded as well.
 
 
 ## Contributing
@@ -22,7 +44,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Authors
 
-* **Harshit Khatri** 
+* **team segfault** 
 
 
 ## License
